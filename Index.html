@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>신비한 인체 탐험: 소화계 & 소화효소 마스터</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Preahvihear & Noto Sans KR -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      user-select: none;
+    }
+    
+    /* 맥박/하이라이트 애니메이션 */
+    @keyframes organPulse {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(255,255,255,0.7)); }
+      50% { transform: scale(1.04); filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.9)); }
+    }
+    .organ-active {
+      animation: organPulse 1.8s infinite ease-in-out;
+      transform-origin: center;
+    }
+
+    /* 음식물 섭취 이동 애니메이션 */
+    @keyframes foodTravel {
+      0% { offset-distance: 0%; opacity: 1; }
+      98% { opacity: 1; }
+      100% { offset-distance: 100%; opacity: 0; }
+    }
+
+    /* 오답 흔들림 애니메이션 */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .shake-animate {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    /* 치아 저작 애니메이션 */
+    @keyframes chewTop {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(14px); }
+    }
+    @keyframes chewBottom {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-14px); }
+    }
+    .chewing-top { animation: chewTop 1.2s infinite ease-in-out; }
+    .chewing-bottom { animation: chewBottom 1.2s infinite ease-in-out; }
+
+    /* 융털 흡수 화살표 애니메이션 */
+    @keyframes absorbFlow {
+      0% { stroke-dashoffset: 40; opacity: 0.2; }
+      50% { opacity: 1; }
+      100% { stroke-dashoffset: 0; opacity: 0.2; }
+    }
+    .absorb-path {
+      stroke-dasharray: 6 4;
+      animation: absorbFlow 1.6s linear infinite;
+    }
+
+    /* 부드러운 스크롤바 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased">
+  
+  <!-- 상단 네비게이션 & 헤더 -->
+  <header class="bg-white/95 backdrop-blur border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center text-white text-xl shadow-md">
+          <i class="fa-solid fa-apple-whole"></i>
+        </div>
+        <div>
+          <h1 class="font-extrabold text-lg sm:text-xl text-slate-900 tracking-tight flex items-center gap-2">
+            소화계 마스터 연구소
+            <span class="text-xs bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full border border-emerald-300">생명과학 탐구</span>
+          </h1>
+          <p class="text-xs text-slate-500 hidden sm:block">입에서 항문까지, 물리적·화학적 소화와 흡수의 모든 것</p>
+        </div>
+      </div>
+
+      <!-- 메인 시트 탭 전환 버튼 -->
+      <div class="flex items-center bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+        <button id="tabBtnExplore" onclick="switchTab('explore')" class="px-3.5 sm:px-5 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex items-center gap-2 bg-white text-indigo-600 shadow-sm">
+          <i class="fa-solid fa-microscope"></i>
+          <span>소화과정 자세히 보기</span>
+        </button>
+        <button id="tabBtnQuiz" onclick="switchTab('quiz')" class="px-3.5 sm:px-5 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex items-center gap-2 text-slate-600 hover:text-slate-900">
+          <i class="fa-solid fa-puzzle-piece"></i>
+          <span>소화 효소 퀴즈</span>
+          <span id="quizBadge" class="bg-indigo-100 text-indigo-700 text-[10px] px-1.5 py-0.5 rounded-full font-extrabold">Q1</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 flex flex-col">
+    
+    <!-- ================================================================= -->
+    <!-- 시트 1: 소화과정 자세히 알아보기 (탐험 뷰)                          -->
+    <!-- ================================================================= -->
+    <section id="sheetExplore" class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+      
+      <!-- 좌측 1: 인체 캐릭터 및 소화계 지도 (5 cols) -->
+      <div class="lg:col-span-5 bg-white rounded-3xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between relative overflow-hidden">
+        
+        <!-- 상단 헤더 & 음식물 섭취 시뮬레이션 버튼 -->
+        <div class="flex items-center justify-between z-10">
+          <div>
+            <div class="flex items-center gap-1.5 text-slate-900 font-black text-base">
+              <i class="fa-solid fa-child text-indigo-500"></i>
+              <span>인체 소화관 네비게이터</span>
+            </div>
+            <p class="text-xs text-slate-400">기관을 클릭하면 오른쪽에서 확대 관찰합니다.</p>
+          </div>
+          <button id="btnRunAnimation" onclick="triggerFoodJourney()" class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 active:scale-95">
+            <i class="fa-solid fa-play text-[10px]"></i>
+            <span>음식물 이동 보기</span>
+          </button>
+        </div>
+
+        <!-- 캐릭터 일러스트레이션 & 기관 SVG -->
+        <div class="relative w-full my-auto py-2 flex items-center justify-center">
+          <svg id="humanBodySvg" class="w-full max-w-[340px] sm:max-w-[380px] h-[520px] select-none" viewBox="0 0 400 680" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- 배경 인체 실루엣 (반투명 및 친근한 아웃라인) -->
+            <path d="M200,30 C235,30 255,50 255,90 C255,125 235,145 220,152 C260,165 300,195 320,240 C340,285 350,370 345,460 C340,540 330,640 330,660 C330,670 310,670 300,660 C280,620 270,550 260,490 C255,460 250,470 240,490 C220,530 210,630 205,670 C203,675 197,675 195,670 C190,630 180,530 160,490 C150,470 145,460 140,490 C130,550 120,620 100,660 C90,670 70,670 70,660 C70,640 60,540 55,460 C50,370 60,285 80,240 C100,195 140,165 180,152 C165,145 145,125 145,90 C145,50 165,30 200,30 Z"
+                  fill="#F1F5F9" stroke="#CBD5E1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            
+            <!-- 귀여운 캐릭터 얼굴 실루엣 라인 -->
+            <circle cx="185" cy="82" r="3.5" fill="#94A3B8" />
+            <circle cx="215" cy="82" r="3.5" fill="#94A3B8" />
+            <path d="M193,96 Q200,102 207,96" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+
+            <!-- 음식물 통과 트랙 가이드 라인 (Path for food animation) -->
+            <path id="digestivePath" d="
+              M 200 105 
+              L 200 210 
+              C 200 240, 240 240, 230 280 
+              C 220 320, 190 320, 185 330
+              C 170 350, 230 355, 205 385
+              C 180 405, 220 425, 200 445
+              C 185 465, 215 480, 200 500
+              L 200 570
+            " fill="none" stroke="transparent" />
+
+            <!-- ================= 기관 인터랙티브 요소들 ================= -->
+
+            <!-- 1. 입 (Mouth) -->
+            <g id="organ_mouth" class="cursor-pointer transition-all duration-300 group" onclick="selectOrgan('mouth')">
+              <rect x="175" y="98" width="50" height="24" rx="12" fill="#F43F5E" fill-opacity="0.15" stroke="#F43F5E" stroke-width="2" />
+              <path d="M 183 110 Q 200 120 217 110 Q 200 102 183 110 Z" fill="#E11D48" stroke="#BE123C" stroke-width="1.5" />
+              <!-- 입 핀/라벨 -->
+              <circle cx="200" cy="110" r="5" fill="#E11D48" class="animate-ping opacity-75" />
+              <circle cx="200" cy="110" r="4" fill="#FFFFFF" />
+            </g>
+
+            <!-- 2. 식도 (Esophagus) -->
+            <g id="organ_esophagus" class="cursor-pointer transition-all duration-300 group" onclick="selectOrgan('esophagus')">
+              <path d="M 194 124 L 194 225 C 194 235 206 235 206 225 L 206 124 Z" fill="#FB923C" fill-opacity="0.6" stroke="#EA580C" stroke-width="2" stroke-dasharray="4 2"/>
+              <!-- 식도 주름 표현 -->
+              <line x1="195" y1="150" x2="205" y2="150" stroke="#C2410C" stroke-width="1.5" />
+              <line x1="195" y1="175" x2="205" y2="175" stroke="#C2410C" stroke-width="1.5" />
+              <line x1="195" y1="200" x2="205" y2="200" stroke="#C2410C" stroke-width="1.5" />
+            </g>
+
+            <!-- 간 (보조 가이드) -->
+            <path d="M 140 230 C 140 215 190 215 195 230 C 195 260 145 280 135 260 Z" fill="#B45309" fill-opacity="0.3" stroke="#92400E" stroke-width="1.5" stroke-dasharray="3 3"/>
+            <text x="145" y="245" font-size="9" fill="#92400E" font-weight="700">간(쓸개즙)</text>
+
+            <!-- 3. 위 (Stomach) -->
+            <g id="organ_stomach" class="cursor-pointer transition-all duration-300 group" onclick="selectOrgan('stomach')">
+              <!-- J 모양의 위장 -->
+              <path d="M 197 225 C 220 220 255 240 250 280 C 245 320 185 330 175 305 C 168 285 180 250 197 225 Z" 
+                    fill="#F87171" fill-opacity="0.85" stroke="#DC2626" stroke-width="2.5" />
+              <!-- 위 내부 주름선 -->
+              <path d="M 210 245 C 230 265 230 290 205 305" stroke="#991B1B" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.6"/>
+              <circle cx="215" cy="275" r="5" fill="#DC2626" />
+            </g>
+
+            <!-- 4. 이자 / 췌장 (Pancreas) - 위 뒤쪽에서 십이지장으로 연결 -->
+            <g id="organ_pancreas" class="cursor-pointer transition-all duration-300 group" onclick="selectOrgan('pancreas')">
+              <path d="M 185 300 C 205 295 235 298 250 310 C 240 322 205 318 180 310 Z" 
+                    fill="#FBBF24" stroke="#D97706" stroke-width="2.2" filter="drop-shadow(0 2px 3px rgba(0,0,0,0.15))"/>
+              <circle cx="215" cy="307" r="3.5" fill="#B45309" />
+            </g>
+
+            <!-- 6. 큰창자 (대장 - Large Intestine: 외부 프레임 형태) -->
+            <g id="organ_large_intestine" class="cursor-pointer transition-all duration-300 group" onclick="selectOrgan('large_intestine')">
+              <!-- 맹장 -> 상행결장 -> 횡행결장 -> 하행결장 -> S결장 -->
+              <path d="
+                M 150 470 
+                C 140 450 140 370 142 345 
+                C 145 330 185 330 255 330 
+                C 265 330 270 370 268 450 
+                C 265 480 235 490 220 510 
+                L 205 540 
+                L 195 540 
+                L 208 505 
+                C 220 480 245 470 248 440 
+                C 250 375 250 350 240 348 
+                C 210 348 165 348 162 360 
+                C 160 380 160 440 168 460 
+                Z" 
+                fill="#34D399" fill-opacity="0.8" stroke="#059669" stroke-width="2.5" stroke-linejoin="round" />
+            </g>
+
+            <!-- 5. 작은창자 (소장 - Small Intestine: 대장 중앙 안쪽 꼬여있는 구조) -->
+            <g id="organ_small_intestine" class="cursor-pointer transition-all duration-300 group" onclick="selectOrgan('small_intestine')">
+              <rect x="165" y="365" width="78" height="95" rx="18" fill="#60A5FA" fill-opacity="0.3" stroke="transparent"/>
+              <!-- 구불구불한 십이지장-공장-회장 패턴 -->
+              <path d="
+                M 180 320 
+                Q 190 355 180 375 
+                Q 225 365 220 385 
+                Q 175 390 180 410 
+                Q 230 405 225 430 
+                Q 175 435 185 455 
+                Q 220 455 210 470" 
+                fill="none" stroke="#2563EB" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="
+                M 180 320 
+                Q 190 355 180 375 
+                Q 225 365 220 385 
+                Q 175 390 180 410 
+                Q 230 405 225 430 
+                Q 175 435 185 455 
+                Q 220 455 210 470" 
+                fill="none" stroke="#93C5FD" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+            </g>
+
+            <!-- 7. 항문 (Anus / 직장 종단) -->
+            <g id="organ_anus" class="cursor-pointer transition-all duration-300 group" onclick="selectOrgan('anus')">
+              <path d="M 194 540 L 206 540 L 204 575 L 196 575 Z" fill="#A855F7" fill-opacity="0.75" stroke="#7E22CE" stroke-width="2" />
+              <ellipse cx="200" cy="576" rx="8" ry="4" fill="#6B21A8" stroke="#581C87" stroke-width="1.5" />
+            </g>
+
+            <!-- 이동하는 음식물 구슬 (시뮬레이션용) -->
+            <circle id="foodPellet" cx="0" cy="0" r="7" fill="#F59E0B" stroke="#FFFFFF" stroke-width="2" class="opacity-0 transition-opacity pointer-events-none shadow-lg">
+              <animate attributeName="r" values="6;8;6" dur="0.8s" repeatCount="indefinite" />
+            </circle>
+          </svg>
+        </div>
+
+        <!-- 하단 빠른 기관 선택 바 (1~7 순서대로 정렬) -->
+        <div class="mt-2 pt-3 border-t border-slate-100 flex flex-wrap gap-1.5 justify-center z-10">
+          <button onclick="selectOrgan('mouth')" data-org="mouth" class="org-chip px-2.5 py-1 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 hover:text-rose-600 transition-colors">1. 입</button>
+          <button onclick="selectOrgan('esophagus')" data-org="esophagus" class="org-chip px-2.5 py-1 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 hover:bg-orange-50 hover:text-orange-600 transition-colors">2. 식도</button>
+          <button onclick="selectOrgan('stomach')" data-org="stomach" class="org-chip px-2.5 py-1 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 hover:bg-red-50 hover:text-red-600 transition-colors">3. 위</button>
+          <button onclick="selectOrgan('pancreas')" data-org="pancreas" class="org-chip px-2.5 py-1 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 hover:bg-amber-50 hover:text-amber-600 transition-colors">4. 이자</button>
+          <button onclick="selectOrgan('small_intestine')" data-org="small_intestine" class="org-chip px-2.5 py-1 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 transition-colors">5. 작은창자</button>
+          <button onclick="selectOrgan('large_intestine')" data-org="large_intestine" class="org-chip px-2.5 py-1 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 hover:bg-emerald-50 hover:text-emerald-600 transition-colors">6. 큰창자</button>
+          <button onclick="selectOrgan('anus')" data-org="anus" class="org-chip px-2.5 py-1 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 hover:bg-purple-50 hover:text-purple-600 transition-colors">7. 항문</button>
+        </div>
+      </div>
+
+      <!-- 우측 2: 선택된 기관의 상세 확대 뷰 & 메커니즘 (7 cols) -->
+      <div class="lg:col-span-7 bg-white rounded-3xl p-5 sm:p-7 shadow-sm border border-slate-200 flex flex-col justify-between">
+        
+        <!-- 기관 타이틀 및 성격 뱃지 -->
+        <div>
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100">
+            <div class="flex items-center gap-3">
+              <span id="detailIcon" class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-2xl shadow-xs">
+                <i class="fa-solid fa-teeth-open"></i>
+              </span>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span id="detailOrder" class="text-xs font-black px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">STEP 1</span>
+                  <h2 id="detailName" class="text-xl sm:text-2xl font-black text-slate-900">입 (Mouth)</h2>
+                </div>
+                <p id="detailSubtitle" class="text-xs sm:text-sm text-slate-500 font-medium">소화의 첫 출발지: 기계적 저작과 녹말의 화학적 분해</p>
+              </div>
+            </div>
+
+            <!-- 소화 구분 태그들 -->
+            <div id="detailTags" class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-xs px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 font-bold border border-amber-200">
+                <i class="fa-solid fa-hammer mr-1 text-[10px]"></i>물리적 소화
+              </span>
+              <span class="text-xs px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 font-bold border border-indigo-200">
+                <i class="fa-solid fa-flask-vial mr-1 text-[10px]"></i>화학적 소화
+              </span>
+            </div>
+          </div>
+
+          <!-- 소화 과정 다이어그램 / 확대 애니메이션 그래픽 영역 -->
+          <div id="detailGraphicContainer" class="mt-4 w-full h-[250px] sm:h-[280px] bg-slate-50 rounded-2xl border border-slate-200/80 p-3 flex items-center justify-center relative overflow-hidden">
+            <!-- 자바스크립트가 선택된 기관에 맞게 인터랙티브 SVG를 실시간 주입함 -->
+          </div>
+
+          <!-- 메커니즘 핵심 요약 카드 2단 그리드 -->
+          <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            <div class="p-3.5 bg-amber-50/70 border border-amber-200/80 rounded-2xl">
+              <h4 class="text-xs font-black text-amber-900 flex items-center gap-1.5 mb-1.5">
+                <i class="fa-solid fa-gears text-amber-600"></i>
+                <span id="labelPhysTitle">물리적 소화 (기계적 운동)</span>
+              </h4>
+              <p id="descPhysical" class="text-xs text-amber-950/80 leading-relaxed">
+                치아로 음식물을 잘게 부수는 저작 운동과 혀의 혼합 운동으로 음식물을 침과 섞어 덩어리(식괴)로 만듭니다.
+              </p>
+            </div>
+
+            <div class="p-3.5 bg-indigo-50/70 border border-indigo-200/80 rounded-2xl">
+              <h4 class="text-xs font-black text-indigo-900 flex items-center gap-1.5 mb-1.5">
+                <i class="fa-solid fa-vial-circle-check text-indigo-600"></i>
+                <span id="labelChemTitle">화학적 소화 (소화 효소)</span>
+              </h4>
+              <p id="descChemical" class="text-xs text-indigo-950/80 leading-relaxed">
+                침샘에서 분비되는 소화효소인 <strong>아밀레이스(Amylase)</strong>가 거대한 <strong>녹말(탄수화물)</strong>을 <strong>엿당과 덱스트린</strong>으로 1차 분해합니다.
+              </p>
+            </div>
+          </div>
+
+          <!-- 영양소 분해/흡수 핵심 팁 배너 -->
+          <div id="nutrientTipBox" class="mt-3.5 p-3.5 bg-slate-900 text-white rounded-2xl flex items-start gap-3 shadow-sm">
+            <div class="text-amber-400 text-lg mt-0.5">
+              <i class="fa-solid fa-lightbulb"></i>
+            </div>
+            <div>
+              <span class="text-[11px] uppercase tracking-wider text-amber-400 font-extrabold block">영양소 소화 핵심 포인트</span>
+              <p id="descNutrientTip" class="text-xs text-slate-200 mt-0.5 leading-relaxed font-normal">
+                밥을 오랫동안 꼭꼭 씹으면 단맛이 나는 이유는 녹말이 아밀레이스에 의해 단맛을 내는 엿당으로 분해되기 때문입니다!
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 다음 단계로 넘어가기 버튼 네비 -->
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+          <button id="btnPrevOrgan" onclick="navigateOrgan(-1)" class="px-4 py-2 text-xs font-bold rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-1.5">
+            <i class="fa-solid fa-chevron-left text-[10px]"></i>
+            <span>이전 기관</span>
+          </button>
+          <span class="text-xs text-slate-400 font-semibold" id="organIndicator">1 / 7 기관</span>
+          <button id="btnNextOrgan" onclick="navigateOrgan(1)" class="px-4 py-2 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white transition-colors flex items-center gap-1.5 shadow-sm">
+            <span>다음 기관</span>
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- 시트 2: 소화 효소 & 영양소 퀴즈 (문제 화면)                         -->
+    <!-- ================================================================= -->
+    <section id="sheetQuiz" class="hidden flex-1 max-w-4xl w-full mx-auto flex flex-col justify-center py-4">
+      
+      <div class="bg-white rounded-3xl p-6 sm:p-9 shadow-sm border border-slate-200 flex flex-col justify-between">
+        
+        <!-- 퀴즈 진행도 및 점수 헤더 -->
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-black text-sm">
+                <i class="fa-solid fa-graduation-cap"></i>
+              </span>
+              <div>
+                <span class="text-xs font-black text-indigo-600 tracking-wide uppercase">소화 원리 확인 퀴즈</span>
+                <h3 class="text-lg font-black text-slate-900" id="quizCategory">탄수화물, 단백질, 지방의 소화</h3>
+              </div>
+            </div>
+
+            <!-- 연속 정답 및 문항 번호 -->
+            <div class="text-right">
+              <div class="text-xs font-bold text-slate-400">진행도</div>
+              <div class="text-sm font-black text-slate-800">
+                <span id="quizIndexText" class="text-indigo-600 text-base">1</span> / <span id="quizTotalText">6</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 프로그레스 바 -->
+          <div class="w-full bg-slate-100 rounded-full h-2.5 mb-6 overflow-hidden">
+            <div id="quizProgressBar" class="bg-gradient-to-r from-indigo-500 to-emerald-500 h-2.5 rounded-full transition-all duration-300" style="width: 16.6%;"></div>
+          </div>
+
+          <!-- 문제 카드 -->
+          <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 mb-6">
+            <div class="inline-block px-2.5 py-1 rounded-lg bg-indigo-100 text-indigo-800 text-xs font-bold mb-2.5" id="quizBadgeTag">
+              탄수화물 소화
+            </div>
+            <h2 id="quizQuestion" class="text-base sm:text-lg font-extrabold text-slate-900 leading-snug">
+              입 속 침에 포함되어 있으며, 밥이나 빵에 들어 있는 녹말(탄수화물)을 엿당으로 분해하는 소화 효소는 무엇일까요?
+            </h2>
+          </div>
+
+          <!-- 4지선다 보기 버튼 리스트 -->
+          <div id="quizOptions" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+            <!-- JS 동적 생성 -->
+          </div>
+
+          <!-- 피드백 메시지 박스 (정답 시 해설, 오답 시 힌트와 재도전 메시지) -->
+          <div id="feedbackBox" class="hidden rounded-2xl p-4 transition-all duration-200">
+            <div class="flex items-start gap-3">
+              <div id="feedbackIcon" class="text-xl mt-0.5"></div>
+              <div class="flex-1">
+                <h4 id="feedbackTitle" class="text-sm font-black mb-1"></h4>
+                <p id="feedbackDesc" class="text-xs leading-relaxed"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 하단 컨트롤 버튼 (정답 시에만 '다음 문제' 버튼 활성화) -->
+        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+          <div class="text-xs text-slate-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-info text-indigo-500"></i>
+            <span>정답을 맞혀야 다음 문제로 나아갈 수 있습니다.</span>
+          </div>
+
+          <button id="btnNextQuiz" onclick="nextQuestion()" disabled class="px-6 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 bg-slate-200 text-slate-400 cursor-not-allowed shadow-none">
+            <span>다음 문제 풀기</span>
+            <i class="fa-solid fa-arrow-right text-xs"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    /* ================================================================= */
+    /* 1. 소화기관 상세 데이터 정의 (순서: 입 -> 식도 -> 위 -> 이자 -> 소장 -> 대장 -> 항문) */
+    /* ================================================================= */
+    const ORGANS_DATA = {
+      mouth: {
+        order: 1,
+        name: "입 (Mouth)",
+        subtitle: "소화의 첫 출발지: 기계적 저작과 녹말의 화학적 분해",
+        icon: "fa-solid fa-teeth-open",
+        iconBg: "bg-rose-100 text-rose-600",
+        tags: [
+          { name: "물리적 소화", class: "bg-amber-50 text-amber-700 border-amber-200" },
+          { name: "화학적 소화", class: "bg-indigo-50 text-indigo-700 border-indigo-200" }
+        ],
+        physical: "치아로 음식물을 잘게 부수는 저작 운동과 혀의 혼합 작용으로 표면적을 넓히고 음식물을 침과 골고루 섞습니다.",
+        chemical: "침샘에서 분비되는 소화효소인 **아밀레이스(Amylase)**가 섭취한 녹말(다당류)을 **엿당(이당류)**과 덱스트린으로 1차 분해합니다.",
+        tip: "밥이나 빵을 20번 이상 꼭꼭 씹으면 입안에서 녹말이 단맛을 띄는 엿당으로 분해되어 은은한 단맛을 느낄 수 있습니다.",
+        renderSvg: () => `
+          <svg viewBox="0 0 400 240" class="w-full h-full" fill="none">
+            <!-- 입 단면 및 치아 저작 애니메이션 -->
+            <g class="chewing-top">
+              <path d="M 60 70 Q 200 45 340 70 L 340 90 L 60 90 Z" fill="#FDA4AF" stroke="#F43F5E" stroke-width="2"/>
+              <!-- 위 치아들 -->
+              <rect x="100" y="85" width="22" height="24" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+              <rect x="130" y="85" width="22" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+              <rect x="160" y="85" width="24" height="28" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+              <rect x="190" y="85" width="24" height="28" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+              <rect x="220" y="85" width="22" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+              <rect x="250" y="85" width="22" height="24" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+            </g>
+
+            <g class="chewing-bottom">
+              <path d="M 60 170 Q 200 195 340 170 L 340 150 L 60 150 Z" fill="#FDA4AF" stroke="#F43F5E" stroke-width="2"/>
+              <!-- 아래 치아들 -->
+              <rect x="100" y="131" width="22" height="24" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+              <rect x="130" y="129" width="22" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+              <rect x="160" y="127" width="24" height="28" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+              <rect x="190" y="127" width="24" height="28" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+              <rect x="220" y="129" width="22" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+              <rect x="250" y="131" width="22" height="24" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+            </g>
+
+            <!-- 중앙: 녹말 분자 구조가 침 아밀레이스에 쪼개지는 애니메이션 -->
+            <g transform="translate(110, 110)">
+              <!-- 녹말 덩어리 사슬 -->
+              <circle cx="20" cy="10" r="10" fill="#3B82F6"/>
+              <circle cx="45" cy="10" r="10" fill="#3B82F6"/>
+              <circle cx="70" cy="10" r="10" fill="#3B82F6"/>
+              <circle cx="95" cy="10" r="10" fill="#3B82F6"/>
+              <text x="5" y="-6" font-size="10" font-weight="bold" fill="#1E40AF">녹말(포도당 사슬)</text>
+
+              <!-- 가위 모양의 아밀레이스 효소 표시 -->
+              <g transform="translate(58, -3) scale(0.9)">
+                <path d="M 0 0 L 20 20 M 20 0 L 0 20" stroke="#EF4444" stroke-width="3.5" stroke-linecap="round"/>
+                <rect x="-8" y="22" width="40" height="16" rx="8" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5"/>
+                <text x="0" y="34" font-size="9" font-weight="900" fill="#991B1B">아밀레이스</text>
+              </g>
+
+              <!-- 분해된 엿당 (2개 포도당 결합) -->
+              <g transform="translate(130, 0)">
+                <circle cx="15" cy="10" r="8" fill="#10B981"/>
+                <circle cx="33" cy="10" r="8" fill="#10B981"/>
+                <text x="8" y="-6" font-size="10" font-weight="bold" fill="#065F46">엿당 생성!</text>
+              </g>
+            </g>
+          </svg>
+        `
+      },
+
+      esophagus: {
+        order: 2,
+        name: "식도 (Esophagus)",
+        subtitle: "꿈틀운동(연동운동)으로 음식물을 위로 운반하는 통로",
+        icon: "fa-solid fa-road",
+        iconBg: "bg-orange-100 text-orange-600",
+        tags: [
+          { name: "물리적 소화(연동운동)", class: "bg-amber-50 text-amber-700 border-amber-200" },
+          { name: "효소 분비 없음", class: "bg-slate-100 text-slate-600 border-slate-200" }
+        ],
+        physical: "식도 벽 근육의 수축과 이완이 파도처럼 일어나는 **꿈틀운동(연동운동)**을 통해 중력과 무관하게(누워있어도) 음식물을 위로 내려보냅니다.",
+        chemical: "식도 자체에서는 소화 효소가 분비되지 않으며, 입에서 섞인 침 아밀레이스가 식도를 통과하는 동안 잠시 작용을 이어갑니다.",
+        tip: "음식물을 삼킬 때는 후두개가 기도를 덮어 음식물이 기관지로 들어가는 사레를 방지해줍니다.",
+        renderSvg: () => `
+          <svg viewBox="0 0 400 240" class="w-full h-full" fill="none">
+            <!-- 수축과 이완을 반복하는 식도 관 -->
+            <path d="M 120 20 Q 140 80 170 100 Q 150 140 120 220" stroke="#EA580C" stroke-width="8" stroke-linecap="round" fill="none"/>
+            <path d="M 280 20 Q 260 80 230 100 Q 250 140 280 220" stroke="#EA580C" stroke-width="8" stroke-linecap="round" fill="none"/>
+            
+            <!-- 연동운동 수축 화살표 -->
+            <path d="M 90 70 L 125 70" stroke="#DC2626" stroke-width="3" marker-end="url(#arrow)" stroke-linecap="round"/>
+            <path d="M 310 70 L 275 70" stroke="#DC2626" stroke-width="3" stroke-linecap="round"/>
+            <text x="50" y="55" font-size="11" font-weight="bold" fill="#DC2626">수축(조여줌)</text>
+            <text x="270" y="55" font-size="11" font-weight="bold" fill="#DC2626">수축(조여줌)</text>
+
+            <!-- 통과 중인 음식물 덩어리(식괴, Bolus) -->
+            <g transform="translate(170, 85)">
+              <ellipse cx="30" cy="30" rx="28" ry="24" fill="#F59E0B" stroke="#D97706" stroke-width="2"/>
+              <circle cx="20" cy="25" r="3" fill="#B45309"/>
+              <circle cx="35" cy="32" r="4" fill="#B45309"/>
+              <circle cx="25" cy="38" r="2.5" fill="#B45309"/>
+              <text x="5" y="68" font-size="11" font-weight="bold" fill="#92400E">음식물 덩어리</text>
+            </g>
+
+            <!-- 아래 방향 진행 화살표 -->
+            <path d="M 200 160 L 200 195" stroke="#2563EB" stroke-width="4" stroke-dasharray="4 3" stroke-linecap="round"/>
+            <text x="210" y="185" font-size="11" font-weight="bold" fill="#2563EB">위장으로 하강</text>
+          </svg>
+        `
+      },
+
+      stomach: {
+        order: 3,
+        name: "위 (Stomach)",
+        subtitle: "강산성 위산과 펩신으로 단백질을 1차 분해",
+        icon: "fa-solid fa-shield-virus",
+        iconBg: "bg-red-100 text-red-600",
+        tags: [
+          { name: "물리적 소화(혼합운동)", class: "bg-amber-50 text-amber-700 border-amber-200" },
+          { name: "화학적 소화(펩신)", class: "bg-indigo-50 text-indigo-700 border-indigo-200" }
+        ],
+        physical: "위벽의 두꺼운 3층 근육이 수축과 이완을 반복하며 음식물을 위액과 강력하게 혼합하여 죽 같은 상태(미즙)로 만듭니다.",
+        chemical: "위샘에서 **염산(위산, HCl)**과 소화효소 전구체(펩시노젠)가 분비됩니다. 강산성 환경에서 활성화된 **펩신(Pepsin)**이 거대한 **단백질**을 중간 크기(폴리펩타이드)로 분해합니다.",
+        tip: "강한 염산(pH 1~2)은 펩신의 작용을 돕고 섭취된 음식물 속 세균을 살균 소독하며, 위벽은 두꺼운 점액층으로 스스로를 보호합니다.",
+        renderSvg: () => `
+          <svg viewBox="0 0 400 240" class="w-full h-full" fill="none">
+            <!-- 위 형태 및 위액 찰랑거림 -->
+            <path d="M 120 40 C 180 30 290 60 280 150 C 270 210 160 220 130 180 C 105 140 110 70 120 40 Z" fill="#FEE2E2" stroke="#EF4444" stroke-width="3"/>
+            <!-- 위액 수위 표현 -->
+            <path d="M 120 130 Q 190 145 270 130 C 270 180 220 210 140 190 Z" fill="#FCA5A5" fill-opacity="0.6"/>
+
+            <!-- 염산(HCl) 방울들과 펩신 효소 가위 작용 -->
+            <g transform="translate(140, 70)">
+              <!-- 단백질 3차원 복합체 -->
+              <rect x="0" y="10" width="70" height="24" rx="8" fill="#8B5CF6" stroke="#6D28D9" stroke-width="2"/>
+              <text x="8" y="26" font-size="11" font-weight="black" fill="#FFFFFF">단백질</text>
+
+              <!-- 펩신 효소 아이콘 -->
+              <g transform="translate(75, 5)">
+                <circle cx="15" cy="15" r="14" fill="#EF4444"/>
+                <text x="4" y="19" font-size="9" font-weight="900" fill="#FFFFFF">펩신</text>
+              </g>
+
+              <!-- 분해된 폴리펩타이드 사슬 -->
+              <g transform="translate(110, 8)">
+                <path d="M 5 15 Q 15 5 25 15 T 45 15" stroke="#A78BFA" stroke-width="5" stroke-linecap="round" fill="none"/>
+                <text x="3" y="36" font-size="9" font-weight="bold" fill="#6D28D9">폴리펩타이드</text>
+              </g>
+            </g>
+
+            <!-- 위산(HCl) 표시 뱃지 -->
+            <g transform="translate(145, 145)">
+              <rect x="0" y="0" width="110" height="30" rx="15" fill="#EF4444"/>
+              <text x="12" y="20" font-size="11" font-weight="black" fill="#FFFFFF">위산(HCl) pH 1.5</text>
+            </g>
+          </svg>
+        `
+      },
+
+      pancreas: {
+        order: 4,
+        name: "이자 / 췌장 (Pancreas)",
+        subtitle: "3대 영양소를 모두 분해하는 전천후 소화효소 공장",
+        icon: "fa-solid fa-industry",
+        iconBg: "bg-amber-100 text-amber-600",
+        tags: [
+          { name: "3대 영양소 분해 효소 분비", class: "bg-amber-50 text-amber-700 border-amber-200" },
+          { name: "이자액(약염기성)", class: "bg-emerald-50 text-emerald-700 border-emerald-200" }
+        ],
+        physical: "이자는 직접 음식물이 통과하지 않는 부속 소화샘 기관으로, 십이지장으로 통하는 이자관을 통해 소화액을 뿜어냅니다.",
+        chemical: "이자액에는 3대 영양소를 모두 분해하는 핵심 효소 3종이 들어 있습니다.\n1) **아밀레이스**: 녹말 → 엿당\n2) **트립신(Trypsin)**: 단백질 → 작은 펩타이드\n3) **라이페이스(Lipase)**: 지방 → **지방산과 모노글리세리드**",
+        tip: "이자액 속의 탄산수소나트륨은 위에서 넘어온 산성 음식물을 중화시켜 소장 효소들이 가장 잘 일할 수 있는 약염기성(pH 7~8)으로 만듭니다.",
+        renderSvg: () => `
+          <svg viewBox="0 0 400 240" class="w-full h-full" fill="none">
+            <!-- 십이지장과 맞물린 이자(췌장) 모식도 -->
+            <!-- 십이지장 관 -->
+            <path d="M 60 50 C 130 50 140 180 60 190" stroke="#93C5FD" stroke-width="26" stroke-linecap="round" fill="none"/>
+            <path d="M 60 50 C 130 50 140 180 60 190" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <text x="30" y="125" font-size="11" font-weight="black" fill="#1D4ED8">십이지장</text>
+
+            <!-- 이자 본체 -->
+            <path d="M 120 110 C 170 90 280 85 330 110 C 310 135 220 145 120 125 Z" fill="#FDE68A" stroke="#F59E0B" stroke-width="3"/>
+            <text x="210" y="115" font-size="12" font-weight="black" fill="#B45309">이자 (Pancreas)</text>
+
+            <!-- 3대 효소 분비 파이프라인 시각화 -->
+            <g transform="translate(130, 150)">
+              <!-- 1. 아밀레이스 (탄수화물) -->
+              <g transform="translate(0, 0)">
+                <rect x="0" y="0" width="75" height="24" rx="6" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5"/>
+                <text x="8" y="16" font-size="10" font-weight="bold" fill="#1E40AF">아밀레이스</text>
+                <text x="8" y="36" font-size="9" fill="#64748B">탄수화물 분해</text>
+              </g>
+
+              <!-- 2. 트립신 (단백질) -->
+              <g transform="translate(85, 0)">
+                <rect x="0" y="0" width="65" height="24" rx="6" fill="#F5F3FF" stroke="#8B5CF6" stroke-width="1.5"/>
+                <text x="11" y="16" font-size="10" font-weight="bold" fill="#5B21B6">트립신</text>
+                <text x="8" y="36" font-size="9" fill="#64748B">단백질 분해</text>
+              </g>
+
+              <!-- 3. 라이페이스 (지방) -->
+              <g transform="translate(160, 0)">
+                <rect x="0" y="0" width="70" height="24" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
+                <text x="9" y="16" font-size="10" font-weight="bold" fill="#991B1B">라이페이스</text>
+                <text x="8" y="36" font-size="9" fill="#64748B">지방 최종 분해</text>
+              </g>
+            </g>
+          </svg>
+        `
+      },
+
+      small_intestine: {
+        order: 5,
+        name: "작은창자 / 소장 (Small Intestine)",
+        subtitle: "최종 화학적 소화의 완성 및 융털을 통한 핵심 영양소 흡수",
+        icon: "fa-solid fa-dna",
+        iconBg: "bg-blue-100 text-blue-600",
+        tags: [
+          { name: "최종 분해 완성", class: "bg-indigo-50 text-indigo-700 border-indigo-200" },
+          { name: "융털 흡수 구조", class: "bg-emerald-50 text-emerald-700 border-emerald-200" }
+        ],
+        physical: "분절 운동(음식물을 잘게 자르고 혼합)과 꿈틀운동(아래로 이동)을 통해 내용물을 융털 상피세포에 긴밀하게 접촉시킵니다.",
+        chemical: "소장 내벽의 탄수화물/단백질 분해 효소들이 작용하여 모든 영양소가 세포막을 통과할 수 있는 최소 단위로 완성됩니다.\n- **탄수화물 → 포도당(Glucose)**\n- **단백질 → 아미노산(Amino Acid)**\n- **지방 → 지방산과 모노글리세리드**",
+        tip: "소장 내부의 수많은 주름과 **융털(Villi)**은 표면적을 약 600배 이상(테니스 코트 크기) 넓혀 영양소를 빠르고 효율적으로 흡수합니다.",
+        renderSvg: () => `
+          <svg viewBox="0 0 400 240" class="w-full h-full" fill="none">
+            <!-- 융털(Villi) 확대 단면 구조도 -->
+            <!-- 융털 외곽 상피세포 -->
+            <path d="M 60 210 L 60 120 C 60 60 140 60 140 120 L 140 210" fill="#FBCFE8" stroke="#DB2777" stroke-width="2"/>
+            <path d="M 140 210 L 140 90 C 140 30 230 30 230 90 L 230 210" fill="#FBCFE8" stroke="#DB2777" stroke-width="2.5"/>
+            <path d="M 230 210 L 230 120 C 230 60 310 60 310 120 L 310 210" fill="#FBCFE8" stroke="#DB2777" stroke-width="2"/>
+
+            <!-- 가운데 큰 융털 내부: 암죽관 (림프관 - 노란색) -->
+            <rect x="175" y="70" width="20" height="140" rx="10" fill="#FEF08A" stroke="#EAB308" stroke-width="2"/>
+            <text x="145" y="195" font-size="10" font-weight="black" fill="#854D0E">암죽관</text>
+            <text x="120" y="210" font-size="8" font-weight="bold" fill="#713F12">(지용성: 지방산, 모노글리세리드)</text>
+
+            <!-- 암죽관을 둘러싼 모세혈관망 (수용성 - 빨간색/파란색) -->
+            <path d="M 160 210 L 160 85 C 160 55 210 55 210 85 L 210 210" stroke="#EF4444" stroke-width="3.5" fill="none" class="absorb-path"/>
+            <text x="220" y="140" font-size="10" font-weight="black" fill="#B91C1C">모세혈관</text>
+            <text x="220" y="155" font-size="8" font-weight="bold" fill="#991B1B">(수용성: 포도당, 아미노산)</text>
+
+            <!-- 주변의 최소 영양소 분자 흡수 화살표 -->
+            <g transform="translate(85, 30)">
+              <circle cx="10" cy="10" r="5" fill="#3B82F6"/>
+              <text x="20" y="14" font-size="9" font-weight="bold" fill="#1E40AF">포도당·아미노산</text>
+              <path d="M 40 20 L 60 38" stroke="#3B82F6" stroke-width="2" stroke-dasharray="2 2" marker-end="url(#arr)"/>
+            </g>
+          </svg>
+        `
+      },
+
+      large_intestine: {
+        order: 6,
+        name: "큰창자 / 대장 (Large Intestine)",
+        subtitle: "수분 재흡수와 대장균의 비타민 합성 및 대변 형성",
+        icon: "fa-solid fa-droplet",
+        iconBg: "bg-emerald-100 text-emerald-600",
+        tags: [
+          { name: "수분 흡수", class: "bg-sky-50 text-sky-700 border-sky-200" },
+          { name: "소화효소 없음", class: "bg-slate-100 text-slate-600 border-slate-200" }
+        ],
+        physical: "느린 연동운동과 팽기수축(주머니 수축)을 통해 남은 찌꺼기 덩어리를 뭉치고 직장 쪽으로 이동시킵니다.",
+        chemical: "소화 효소는 전혀 분비되지 않습니다. 주로 소장에서 흡수되고 남은 물과 무기염류의 **수분을 집중 재흡수**하여 찌꺼기를 단단한 대변으로 가공합니다.",
+        tip: "수분 흡수가 제대로 이루어지지 않고 너무 빠르게 지나치면 설사가 되고, 너무 오래 머물러 수분을 과도하게 빼앗기면 변비가 됩니다.",
+        renderSvg: () => `
+          <svg viewBox="0 0 400 240" class="w-full h-full" fill="none">
+            <!-- 대장 벽과 수분 흡수 물방울 애니메이션 -->
+            <path d="M 90 200 C 90 80 120 50 200 50 C 280 50 310 80 310 200" stroke="#34D399" stroke-width="36" stroke-linecap="round" fill="none"/>
+            <path d="M 90 200 C 90 80 120 50 200 50 C 280 50 310 80 310 200" stroke="#059669" stroke-width="3" stroke-linecap="round" fill="none"/>
+
+            <!-- 대장 주름 표현 -->
+            <line x1="120" y1="45" x2="120" y2="70" stroke="#047857" stroke-width="2"/>
+            <line x1="160" y1="35" x2="160" y2="65" stroke="#047857" stroke-width="2"/>
+            <line x1="200" y1="35" x2="200" y2="65" stroke="#047857" stroke-width="2"/>
+            <line x1="240" y1="35" x2="240" y2="65" stroke="#047857" stroke-width="2"/>
+            <line x1="280" y1="45" x2="280" y2="70" stroke="#047857" stroke-width="2"/>
+
+            <!-- 수분(H2O) 흡수 아이콘들 -->
+            <g transform="translate(160, 95)">
+              <circle cx="20" cy="20" r="14" fill="#60A5FA" fill-opacity="0.8"/>
+              <path d="M 20 10 C 20 10 13 18 13 23 C 13 27 16 30 20 30 C 24 30 27 27 27 23 C 27 18 20 10 20 10 Z" fill="#FFFFFF"/>
+              <text x="3" y="48" font-size="10" font-weight="black" fill="#1D4ED8">H₂O 수분 재흡수</text>
+            </g>
+
+            <!-- 찌꺼기 덩어리 이동 -->
+            <ellipse cx="295" cy="170" rx="12" ry="16" fill="#78350F" stroke="#451A03" stroke-width="1.5"/>
+            <text x="250" y="215" font-size="10" font-weight="bold" fill="#78350F">찌꺼기(대변 형성)</text>
+          </svg>
+        `
+      },
+
+      anus: {
+        order: 7,
+        name: "항문 (Anus)",
+        subtitle: "소화되지 않은 음식물 찌꺼기의 최종 배출(배변 작용)",
+        icon: "fa-solid fa-circle-notch",
+        iconBg: "bg-purple-100 text-purple-600",
+        tags: [
+          { name: "배설 / 배변", class: "bg-purple-50 text-purple-700 border-purple-200" },
+          { name: "괄약근 조절", class: "bg-slate-100 text-slate-600 border-slate-200" }
+        ],
+        physical: "내항문괄약근(자율신경 조절)과 외항문괄약근(수의근, 의지대로 조절)의 정교한 이완 작용을 통해 변을 체외로 방출합니다.",
+        chemical: "더 이상의 화학적 분해나 영양소 흡수는 일어나지 않으며, 인체에서 소화되지 않은 섬유질과 장내 세균 찌꺼기를 배출합니다.",
+        tip: "세포 호흡 결과 생긴 노폐물(요소 등)을 내보내는 '배설(신장/오줌)'과 음식물 찌꺼기를 내보내는 '배변(항문)'은 과학적으로 구분됩니다.",
+        renderSvg: () => `
+          <svg viewBox="0 0 400 240" class="w-full h-full" fill="none">
+            <!-- 직장 및 괄약근 밸브 구조 -->
+            <path d="M 170 30 L 170 120 Q 170 160 185 180 L 185 200" stroke="#9333EA" stroke-width="8" stroke-linecap="round" fill="none"/>
+            <path d="M 230 30 L 230 120 Q 230 160 215 180 L 215 200" stroke="#9333EA" stroke-width="8" stroke-linecap="round" fill="none"/>
+
+            <!-- 괄약근 링 -->
+            <rect x="160" y="150" width="22" height="30" rx="6" fill="#A855F7" stroke="#6B21A8" stroke-width="2"/>
+            <rect x="218" y="150" width="22" height="30" rx="6" fill="#A855F7" stroke="#6B21A8" stroke-width="2"/>
+            <text x="80" y="170" font-size="11" font-weight="black" fill="#6B21A8">내·외 괄약근</text>
+
+            <!-- 배출 화살표 -->
+            <path d="M 200 170 L 200 220" stroke="#10B981" stroke-width="4" stroke-dasharray="4 3"/>
+            <polygon points="200,230 193,218 207,218" fill="#10B981"/>
+            <text x="215" y="215" font-size="11" font-weight="black" fill="#047857">체외 배출 완료</text>
+          </svg>
+        `
+      }
+    };
+
+    const organKeys = Object.keys(ORGANS_DATA);
+    let currentOrganKey = "mouth";
+
+    /* ================================================================= */
+    /* 2. 퀴즈 데이터셋 (탄수화물, 단백질, 지방 분해효소 및 흡수)          */
+    /* ================================================================= */
+    const QUIZ_LIST = [
+      {
+        id: 1,
+        category: "탄수화물(녹말)의 소화 효소",
+        badge: "탄수화물 1차 분해",
+        question: "입에서 분비되는 침 속에 들어 있으며, 밥이나 빵 속에 풍부한 녹말(탄수화물)을 '엿당'으로 분해하는 소화효소는 무엇일까요?",
+        options: [
+          "펩신 (Pepsin)",
+          "아밀레이스 (Amylase)",
+          "트립신 (Trypsin)",
+          "라이페이스 (Lipase)"
+        ],
+        answerIndex: 1,
+        hint: "침샘과 이자액에서 공통으로 분비되어 녹말을 싹둑 자르는 효소입니다. 앞글자는 '아'입니다.",
+        explanation: "참 잘했습니다! **아밀레이스(Amylase)**는 녹말의 결합을 끊어 이당류인 엿당과 덱스트린으로 분해합니다. 밥을 오래 씹으면 단맛이 나는 이유이기도 합니다."
+      },
+      {
+        id: 2,
+        category: "단백질의 소화 효소 (위장)",
+        badge: "단백질 1차 분해",
+        question: "위에서 분비되는 강한 산성 물질인 '염산(위산)'의 도움을 받아 활성화되며, 고기나 콩 속의 단백질을 1차로 분해하는 소화효소는?",
+        options: [
+          "라이페이스 (Lipase)",
+          "쓸개즙 (Bile)",
+          "펩신 (Pepsin)",
+          "말테이스 (Maltase)"
+        ],
+        answerIndex: 2,
+        hint: "위샘에서 분비되며 산성 환경(pH 1~2)에서 최적의 활성을 가집니다. 이름이 '펩'으로 시작합니다.",
+        explanation: "정답입니다! **펩신(Pepsin)**은 위액 속의 염산에 의해 활성화되어 거대한 단백질을 중간 크기의 폴리펩타이드로 쪼개는 중요한 단백질 1차 분해 효소입니다."
+      },
+      {
+        id: 3,
+        category: "지방의 소화 효소 (이자액)",
+        badge: "지방 최종 분해",
+        question: "이자(췌장)에서 분비되어 십이지장으로 보내지며, 지방을 '지방산'과 '모노글리세리드'로 최종 분해하는 핵심 소화효소는 무엇일까요?",
+        options: [
+          "라이페이스 (Lipase)",
+          "트립신 (Trypsin)",
+          "펩신 (Pepsin)",
+          "아밀레이스 (Amylase)"
+        ],
+        answerIndex: 0,
+        hint: "지방질(Lipid)을 분해하는 효소로 이름에 '라이(Li)'가 들어갑니다.",
+        explanation: "완벽합니다! **라이페이스(Lipase)**는 쓸개즙에 의해 물리적으로 유화된 지방 덩어리를 화학적으로 분해하여 가장 작은 흡수 단위인 지방산과 모노글리세리드로 만듭니다."
+      },
+      {
+        id: 4,
+        category: "단백질의 소화 효소 (이자액)",
+        badge: "단백질 2차 분해",
+        question: "이자에서 만들어져 소장(십이지장)으로 분비되는 효소로, 위에서 넘어온 중간 단계 단백질을 더 작은 펩타이드로 분해하는 단백질 분해 효소는?",
+        options: [
+          "수크레이스",
+          "트립신 (Trypsin)",
+          "침 아밀레이스",
+          "위산 (HCl)"
+        ],
+        answerIndex: 1,
+        hint: "이자의 3대 소화효소 중 단백질을 담당하며, 이름이 '트'로 시작합니다.",
+        explanation: "아주 훌륭해요! **트립신(Trypsin)**은 이자액에 포함된 강력한 단백질 분해 효소로, 폴리펩타이드를 더욱 미세한 펩타이드 조각들로 분해합니다."
+      },
+      {
+        id: 5,
+        category: "소장 융털의 영양소 흡수 경로",
+        badge: "영양소 흡수 구조",
+        question: "작은창자 융털에서 포도당과 아미노산 같은 '수용성(물에 녹는) 영양소'가 흡수되어 간으로 이동하는 통로는 어디일까요?",
+        options: [
+          "암죽관 (림프관)",
+          "모세혈관",
+          "위벽 동맥",
+          "대장 점막"
+        ],
+        answerIndex: 1,
+        hint: "지용성 영양소(지방산, 비타민 A·D)는 암죽관으로, 물에 잘 녹는 수용성 영양소는 혈액의 핏줄인 이곳으로 들어갑니다.",
+        explanation: "정답입니다! 융털 중심부의 암죽관 둘레를 감싸고 있는 **모세혈관**은 수용성 영양소(포도당, 아미노산, 수용성 비타민 B·C, 무기염류)를 흡수하여 간문맥을 거쳐 온몸으로 보냅니다."
+      },
+      {
+        id: 6,
+        category: "큰창자(대장)의 주요 역할",
+        badge: "대장 기능",
+        question: "소화 효소는 전혀 분비되지 않지만, 음식물 찌꺼기에서 이것을 집중적으로 재흡수하여 단단한 대변을 형성하는 대장의 가장 주된 기능은 무엇일까요?",
+        options: [
+          "단백질 흡수",
+          "지방의 유화 작용",
+          "수분(물)의 흡수",
+          "녹말의 포도당 전환"
+        ],
+        answerIndex: 2,
+        hint: "우리 몸의 탈수를 막고 변의 형태를 잡아주는 투명한 액체 분자입니다.",
+        explanation: "대단합니다! 모든 퀴즈를 정복하셨습니다! **큰창자(대장)**는 소화 효소를 분비하지 않고, 주로 **수분을 재흡수**하여 체내 항상성을 유지하고 찌꺼기를 배출 가능한 변 형태로 만듭니다."
+      }
+    ];
+
+    let currentQuizIndex = 0;
+    let hasAnsweredCorrectly = false;
+
+    function switchTab(tab) {
+      const exploreTab = document.getElementById("tabBtnExplore");
+      const quizTab = document.getElementById("tabBtnQuiz");
+      const sheetExplore = document.getElementById("sheetExplore");
+      const sheetQuiz = document.getElementById("sheetQuiz");
+
+      if (tab === 'explore') {
+        exploreTab.className = "px-3.5 sm:px-5 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex items-center gap-2 bg-white text-indigo-600 shadow-sm";
+        quizTab.className = "px-3.5 sm:px-5 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex items-center gap-2 text-slate-600 hover:text-slate-900";
+        sheetExplore.classList.remove("hidden");
+        sheetQuiz.classList.add("hidden");
+      } else {
+        quizTab.className = "px-3.5 sm:px-5 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex items-center gap-2 bg-white text-indigo-600 shadow-sm";
+        exploreTab.className = "px-3.5 sm:px-5 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex items-center gap-2 text-slate-600 hover:text-slate-900";
+        sheetExplore.classList.add("hidden");
+        sheetQuiz.classList.remove("hidden");
+        renderCurrentQuiz();
+      }
+    }
+
+    function selectOrgan(organKey) {
+      if (!ORGANS_DATA[organKey]) return;
+      currentOrganKey = organKey;
+      const data = ORGANS_DATA[organKey];
+
+      // 1. 헤더 텍스트 및 태그 업데이트
+      document.getElementById("detailOrder").textContent = `STEP ${data.order}`;
+      document.getElementById("detailName").textContent = data.name;
+      document.getElementById("detailSubtitle").textContent = data.subtitle;
+
+      const iconElem = document.getElementById("detailIcon");
+      iconElem.className = `w-12 h-12 rounded-2xl ${data.iconBg} flex items-center justify-center text-2xl shadow-xs`;
+      iconElem.innerHTML = `<i class="${data.icon}"></i>`;
+
+      // 태그 뱃지 렌더링
+      const tagsContainer = document.getElementById("detailTags");
+      tagsContainer.innerHTML = data.tags.map(t => 
+        `<span class="text-xs px-2.5 py-1 rounded-full ${t.class} font-bold border">${t.name}</span>`
+      ).join('');
+
+      // 2. 설명란 업데이트 (볼드 마크다운 서식 지원)
+      const formatMd = (text) => text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-extrabold text-slate-900">$1</strong>').replace(/\n/g, '<br/>');
+      document.getElementById("descPhysical").innerHTML = formatMd(data.physical);
+      document.getElementById("descChemical").innerHTML = formatMd(data.chemical);
+      document.getElementById("descNutrientTip").innerHTML = formatMd(data.tip);
+
+      // 3. 인디케이터 번호 업데이트
+      document.getElementById("organIndicator").textContent = `${data.order} / ${organKeys.length} 기관`;
+
+      // 4. 오른쪽 확대 일러스트레이션 렌더링
+      const graphicContainer = document.getElementById("detailGraphicContainer");
+      graphicContainer.innerHTML = data.renderSvg();
+
+      // 5. SVG 인체 맵 하이라이트 클래스 적용
+      organKeys.forEach(key => {
+        const elem = document.getElementById(`organ_${key}`);
+        if (elem) {
+          if (key === organKey) {
+            elem.classList.add("organ-active");
+            elem.style.filter = "drop-shadow(0 0 8px rgba(37, 99, 235, 0.8))";
+          } else {
+            elem.classList.remove("organ-active");
+            elem.style.filter = "none";
+          }
+        }
+      });
+
+      // 6. 하단 칩 버튼 활성화 스타일
+      document.querySelectorAll(".org-chip").forEach(btn => {
+        const orgAttr = btn.getAttribute("data-org");
+        if (orgAttr === organKey) {
+          btn.className = "org-chip px-2.5 py-1 text-xs font-bold rounded-lg border border-indigo-500 bg-indigo-600 text-white shadow-xs transition-colors";
+        } else {
+          btn.className = "org-chip px-2.5 py-1 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors";
+        }
+      });
+    }
+
+    function navigateOrgan(direction) {
+      const idx = organKeys.indexOf(currentOrganKey);
+      let newIdx = idx + direction;
+      if (newIdx < 0) newIdx = organKeys.length - 1;
+      if (newIdx >= organKeys.length) newIdx = 0;
+      selectOrgan(organKeys[newIdx]);
+    }
+
+    let isAnimatingFood = false;
+    function triggerFoodJourney() {
+      if (isAnimatingFood) return;
+      isAnimatingFood = true;
+
+      const pellet = document.getElementById("foodPellet");
+      const path = document.getElementById("digestivePath");
+      const pathLength = path.getTotalLength();
+      
+      pellet.classList.remove("opacity-0");
+      pellet.classList.add("opacity-100");
+
+      let startTime = null;
+      const duration = 4500; // 4.5초에 걸쳐 이동
+
+      function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const progress = (timestamp - startTime) / duration;
+
+        if (progress <= 1) {
+          const point = path.getPointAtLength(progress * pathLength);
+          pellet.setAttribute("cx", point.x);
+          pellet.setAttribute("cy", point.y);
+
+          // 진행도에 따라 기관 자동 하이라이트 전환
+          if (progress < 0.1) selectOrgan('mouth');
+          else if (progress < 0.25) selectOrgan('esophagus');
+          else if (progress < 0.45) selectOrgan('stomach');
+          else if (progress < 0.6) selectOrgan('pancreas');
+          else if (progress < 0.8) selectOrgan('small_intestine');
+          else if (progress < 0.95) selectOrgan('large_intestine');
+          else selectOrgan('anus');
+
+          requestAnimationFrame(step);
+        } else {
+          pellet.classList.remove("opacity-100");
+          pellet.classList.add("opacity-0");
+          isAnimatingFood = false;
+        }
+      }
+
+      requestAnimationFrame(step);
+    }
+
+    function renderCurrentQuiz() {
+      const q = QUIZ_LIST[currentQuizIndex];
+      hasAnsweredCorrectly = false;
+
+      // 상단 헤더 및 진행도
+      document.getElementById("quizCategory").textContent = q.category;
+      document.getElementById("quizBadgeTag").textContent = q.badge;
+      document.getElementById("quizIndexText").textContent = currentQuizIndex + 1;
+      document.getElementById("quizTotalText").textContent = QUIZ_LIST.length;
+      document.getElementById("quizBadge").textContent = `Q${currentQuizIndex + 1}`;
+
+      const progressPercent = ((currentQuizIndex + 1) / QUIZ_LIST.length) * 100;
+      document.getElementById("quizProgressBar").style.width = `${progressPercent}%`;
+
+      document.getElementById("quizQuestion").textContent = q.question;
+
+      // 피드백 박스 초기화 및 숨김
+      const feedbackBox = document.getElementById("feedbackBox");
+      feedbackBox.classList.add("hidden");
+      feedbackBox.className = "hidden rounded-2xl p-4 transition-all duration-200";
+
+      // 다음 문제 버튼 비활성화 (정답을 맞혀야만 활성화!)
+      const nextBtn = document.getElementById("btnNextQuiz");
+      nextBtn.disabled = true;
+      nextBtn.className = "px-6 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 bg-slate-200 text-slate-400 cursor-not-allowed shadow-none";
+
+      // 보기 생성
+      const optContainer = document.getElementById("quizOptions");
+      optContainer.innerHTML = "";
+
+      q.options.forEach((optText, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "quiz-opt-btn w-full p-4 rounded-2xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 transition-all duration-150 text-left flex items-center justify-between group";
+        btn.onclick = () => checkAnswer(idx);
+
+        btn.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 font-black text-xs flex items-center justify-center group-hover:bg-indigo-100 group-hover:text-indigo-700 transition-colors">
+              ${idx + 1}
+            </span>
+            <span class="text-xs sm:text-sm font-bold text-slate-800">${optText}</span>
+          </div>
+          <i class="fa-regular fa-circle text-slate-300 group-hover:text-slate-400"></i>
+        `;
+        optContainer.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selectedIndex) {
+      if (hasAnsweredCorrectly) return; // 이미 맞췄다면 추가 클릭 방지
+
+      const q = QUIZ_LIST[currentQuizIndex];
+      const feedbackBox = document.getElementById("feedbackBox");
+      const feedbackIcon = document.getElementById("feedbackIcon");
+      const feedbackTitle = document.getElementById("feedbackTitle");
+      const feedbackDesc = document.getElementById("feedbackDesc");
+      const optionButtons = document.querySelectorAll(".quiz-opt-btn");
+
+      if (selectedIndex === q.answerIndex) {
+        // [정답인 경우]
+        hasAnsweredCorrectly = true;
+
+        // 버튼 스타일: 초록색 하이라이트
+        optionButtons[selectedIndex].className = "quiz-opt-btn w-full p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50/70 text-left flex items-center justify-between shadow-xs";
+        optionButtons[selectedIndex].querySelector("i").className = "fa-solid fa-circle-check text-emerald-600 text-lg";
+
+        // 피드백 박스: 칭찬 및 상세 해설
+        feedbackBox.classList.remove("hidden");
+        feedbackBox.className = "rounded-2xl p-4 bg-emerald-50 border border-emerald-300 text-emerald-950 transition-all duration-200";
+        feedbackIcon.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i>`;
+        feedbackTitle.textContent = "정답입니다! 완벽하게 이해하셨군요! 🎉";
+        feedbackDesc.innerHTML = q.explanation.replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-900 font-extrabold">$1</strong>');
+
+        // 축하 컨페티 효과
+        try {
+          confetti({
+            particleCount: 50,
+            spread: 60,
+            origin: { y: 0.7 }
+          });
+        } catch(e) {}
+
+        // '다음 문제 풀기' 버튼 활성화 (진행 허용)
+        const nextBtn = document.getElementById("btnNextQuiz");
+        nextBtn.disabled = false;
+        nextBtn.className = "px-6 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-md cursor-pointer active:scale-95";
+
+      } else {
+        // [오답인 경우] - 절대로 문제가 넘어가지 않고 힌트와 함께 재도전
+        const wrongBtn = optionButtons[selectedIndex];
+        wrongBtn.classList.add("shake-animate");
+        wrongBtn.className = "quiz-opt-btn w-full p-4 rounded-2xl border-2 border-rose-400 bg-rose-50 text-left flex items-center justify-between shake-animate";
+        wrongBtn.querySelector("i").className = "fa-solid fa-circle-xmark text-rose-500 text-lg";
+
+        setTimeout(() => {
+          wrongBtn.classList.remove("shake-animate");
+        }, 400);
+
+        // 피드백 박스: 힌트 및 재도전 안내
+        feedbackBox.classList.remove("hidden");
+        feedbackBox.className = "rounded-2xl p-4 bg-amber-50 border border-amber-300 text-amber-950 transition-all duration-200";
+        feedbackIcon.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-600"></i>`;
+        feedbackTitle.textContent = "다시 한번 생각해볼까요? 💡";
+        feedbackDesc.innerHTML = `아쉽지만 정답이 아닙니다. <br/><span class="font-bold text-amber-900 mt-1 inline-block">힌트: ${q.hint}</span><br/><span class="text-xs text-amber-800">다른 보기를 선택해보세요!</span>`;
+      }
+    }
+
+    function nextQuestion() {
+      if (!hasAnsweredCorrectly) return;
+
+      if (currentQuizIndex < QUIZ_LIST.length - 1) {
+        currentQuizIndex++;
+        renderCurrentQuiz();
+      } else {
+        // 모든 퀴즈 완료 시 모달 축하
+        showQuizCompletionModal();
+      }
+    }
+
+    function showQuizCompletionModal() {
+      const modal = document.createElement("div");
+      modal.className = "fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in";
+      modal.innerHTML = `
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full text-center shadow-2xl border border-slate-100">
+          <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl mx-auto mb-4">
+            <i class="fa-solid fa-trophy"></i>
+          </div>
+          <h3 class="text-xl font-black text-slate-900 mb-2">소화계 마스터 완주 성공!</h3>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
+            탄수화물, 단백질, 지방의 물리적·화학적 소화와 소화효소(아밀레이스, 펩신, 트립신, 라이페이스)의 작용을 모두 마스터하셨습니다!
+          </p>
+          <div class="flex flex-col gap-2">
+            <button onclick="restartQuiz(this)" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm rounded-xl transition-all shadow-sm">
+              처음부터 다시 도전하기
+            </button>
+            <button onclick="closeModalAndExplore(this)" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-sm rounded-xl transition-all">
+              소화기관 다시 관찰하기
+            </button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      try {
+        confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
+      } catch(e) {}
+    }
+
+    function restartQuiz(btn) {
+      const modal = btn.closest(".fixed");
+      if (modal) modal.remove();
+      currentQuizIndex = 0;
+      renderCurrentQuiz();
+    }
+
+    function closeModalAndExplore(btn) {
+      const modal = btn.closest(".fixed");
+      if (modal) modal.remove();
+      switchTab('explore');
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      // 기본 첫 번째 기관(입) 선택 및 UI 렌더링
+      selectOrgan("mouth");
+    });
+  </script>
+</body>
+</html>
